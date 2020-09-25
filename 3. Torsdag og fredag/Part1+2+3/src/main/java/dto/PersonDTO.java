@@ -42,7 +42,7 @@ public class PersonDTO {
         this.zip = zip;
         this.city = city;
     }
-
+    
     public int getId() {
         return id;
     }

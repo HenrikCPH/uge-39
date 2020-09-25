@@ -10,6 +10,7 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
+import utils.EMF_Creator;
 
 public class PersonFacade implements IPersonFacade {
 
@@ -109,31 +110,59 @@ public class PersonFacade implements IPersonFacade {
     }
 
     @Override
-        public PersonDTO addPerson(String firstName, String lastName, String phone, String street, String zip, String city) throws MissingInputException{
-	if((firstName.length() == 0) || (lastName.length() == 0)){
-		throw new MissingInputException("First Name and/pr Last name is missing");
-	}
-	EntityManager em = getEntityManager();
-	Person person = new Person(firstName, lastName, phone);
+    public PersonDTO addPerson(String firstName, String lastName, String phone, String street, String zip, String city) throws MissingInputException {
+        if ((firstName.length() == 0) || (lastName.length() == 0)) {
+            throw new MissingInputException("First Name and/pr Last name is missing");
+        }
+        EntityManager em = getEntityManager();
+        Person person = new Person(firstName, lastName, phone);
 
-	try {
-		em.getTransaction().begin();
-			Query query = em.createQuery("SELECT a FROM Address a WHERE a.street = :street AND a.zip = :zip AND a.city = :ctiy");
-			query.setParameter("street", street);
-			query.setParameter("zip",zip);
-			query.setParameter("city",city);
-			List<Address> addresses = query.getResultList();
-			if(addresses.size() > 0){
-		           person.setAddress(addresses.get(0));
-			} else {
-			   person.setAddress(new Address(street,zip,city));
-			}
-			em.persist(person);
-		      em.getTransaction().commit();
-		} finally {
-			em.close();
-		}
-		return new PersonDTO(person);
-	}
+        try {
+            em.getTransaction().begin();
+            Query query = em.createQuery("SELECT a FROM Address a WHERE a.street = :street AND a.zip = :zip AND a.city = :ctiy");
+            query.setParameter("street", street);
+            query.setParameter("zip", zip);
+            query.setParameter("city", city);
+            List<Address> addresses = query.getResultList();
+            if (addresses.size() > 0) {
+                person.setAddress(addresses.get(0));
+            } else {
+                person.setAddress(new Address(street, zip, city));
+            }
+            em.persist(person);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+        return new PersonDTO(person);
+    }
+
+    public static void main(String[] args) {
+        //Create emf pointing to the dev-database
+        EntityManagerFactory emf = EMF_Creator.createEntityManagerFactory();
+
+        EntityManager em = emf.createEntityManager();
+
+        Person p1 = new Person("Mark Sørensen", "cph-ms845", "Tenet");
+        Person p2 = new Person("Henrik Lønquist Thomasen", "cph-ht92", "1917");
+        Person p3 = new Person("Yones El Bana", "cph-ye7", "parasite");
+
+        Address a1 = new Address("Big Street", "This zippo lighter", "censur city");
+        Address a2 = new Address("Small Street", "Another zippo lighter", "spam town");
+        Address a3 = new Address("Tiny Street", "missing zip", "no city exist");
+
+        p1.setAddress(a2);
+        p2.setAddress(a1);
+        p3.setAddress(a3);
         
+        try {
+            em.getTransaction().begin();
+            em.persist(p1);
+            em.persist(p2);
+            em.persist(p3);
+            em.getTransaction().commit();
+        } finally {
+            em.close();
+        }
+    }
 }

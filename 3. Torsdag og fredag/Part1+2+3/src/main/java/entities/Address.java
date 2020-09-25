@@ -1,6 +1,7 @@
 package entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -23,7 +24,7 @@ public class Address implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String street;
     private String zip;
@@ -37,12 +38,11 @@ public class Address implements Serializable {
     
 
     public Address(String street, String zip, String city) {
-        this.id = id;
         this.street = street;
         this.zip = zip;
         this.city = city;
+        persons = new ArrayList<>();
     }
-    
     
     public void addPerson(Person person){
         if(person != null){

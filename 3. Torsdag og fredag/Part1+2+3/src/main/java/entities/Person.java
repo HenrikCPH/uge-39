@@ -41,6 +41,8 @@ public class Person implements Serializable {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
+        this.created = new Date();
+        this.lastEdited = created;
     }
 
     public Person(int id, Date created, Date lastEdited, String firstName, String lastName, String phone) {
